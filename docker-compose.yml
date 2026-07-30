@@ -1,0 +1,50 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: email-material-requests-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "EmailMaterial@123"
+    ports:
+      - "14333:1433"
+    volumes:
+      - mssql_data:/var/opt/mssql
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q \"SELECT 1\" || exit 1",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 20s
+
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: email-material-requests-db-init
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: "EmailMaterial@123"
+    volumes:
+      - ./database/migrations:/migrations:ro
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        set -e
+        echo ">> Aguardando SQL Server..."
+        until /opt/mssql-tools18/bin/sqlcmd -S db -U sa -P "$$MSSQL_SA_PASSWORD" -C -Q "SELECT 1" > /dev/null 2>&1; do
+          sleep 2
+        done
+        echo ">> Executando migration 001..."
+        /opt/mssql-tools18/bin/sqlcmd -S db -U sa -P "$$MSSQL_SA_PASSWORD" -C -i /migrations/001_create_database.sql
+        echo ">> Executando migration 002..."
+        /opt/mssql-tools18/bin/sqlcmd -S db -U sa -P "$$MSSQL_SA_PASSWORD" -C -d email_material_requests -i /migrations/002_create_tables.sql
+        echo ">> Migrations concluidas."
+    restart: "no"
+
+volumes:
+  mssql_data:
