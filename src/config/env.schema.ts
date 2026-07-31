@@ -29,12 +29,16 @@ export const envSchema = z.object({
   ORDER_SYSTEM_API_URL: z.string().optional(),
   ORDER_SYSTEM_API_KEY: optionalNonEmptyString,
 
+  AI_PROVIDER: z.enum(['gemini', 'openai']).default('gemini'),
+  GEMINI_API_KEY: optionalNonEmptyString,
+  GEMINI_MODEL: z.string().min(1).default('gemini-2.0-flash-lite'),
   OPENAI_API_KEY: optionalNonEmptyString,
   AI_MODEL: z.string().min(1).default('gpt-4o-mini'),
   AI_CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.7),
 });
 
 export type RawEnv = z.infer<typeof envSchema>;
+export type AiProvider = RawEnv['AI_PROVIDER'];
 
 export interface Env {
   nodeEnv: RawEnv['NODE_ENV'];
@@ -63,8 +67,11 @@ export interface Env {
     apiKey?: string;
   };
   ai: {
-    apiKey?: string;
-    model: string;
+    provider: AiProvider;
+    geminiApiKey?: string;
+    geminiModel: string;
+    openaiApiKey?: string;
+    openaiModel: string;
     confidenceThreshold: number;
   };
 }
@@ -97,8 +104,11 @@ export function mapRawEnvToConfig(raw: RawEnv): Env {
       apiKey: raw.ORDER_SYSTEM_API_KEY,
     },
     ai: {
-      apiKey: raw.OPENAI_API_KEY,
-      model: raw.AI_MODEL,
+      provider: raw.AI_PROVIDER,
+      geminiApiKey: raw.GEMINI_API_KEY,
+      geminiModel: raw.GEMINI_MODEL,
+      openaiApiKey: raw.OPENAI_API_KEY,
+      openaiModel: raw.AI_MODEL,
       confidenceThreshold: raw.AI_CONFIDENCE_THRESHOLD,
     },
   };
