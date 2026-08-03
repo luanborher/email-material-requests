@@ -93,6 +93,7 @@ Copie `.env.example` para `.env`. A senha `DB_PASSWORD` deve ser a mesma do `doc
 
 ## Endpoints
 
+- `GET /` — Info do serviço e lista de endpoints
 - `GET /health` — Health check do serviço e conexão com o banco
 - `GET /auth/gmail` — Inicia OAuth do Gmail (setup)
 - `GET /gmail/messages/unread` — Lista e-mails não lidos
