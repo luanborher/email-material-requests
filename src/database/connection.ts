@@ -43,5 +43,3 @@ export async function checkDatabaseConnection(): Promise<boolean> {
 
   return result.recordset[0]?.ok === 1;
 }
-
-export { sql };

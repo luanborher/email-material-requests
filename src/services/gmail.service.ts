@@ -1,18 +1,19 @@
-import { google } from 'googleapis';
+import { google, type gmail_v1 } from 'googleapis';
 import type { GmailAuthService } from './gmail-auth.service.js';
 import type { EmailMessage } from '../types/email.js';
 import { mapGmailMessageToEmailMessage } from '../utils/gmail-message.parser.js';
 import { gmailAuthService } from './gmail-auth.service.js';
 
 export class GmailService {
+  private gmailClient: gmail_v1.Gmail | null = null;
+
   constructor(private readonly authService: GmailAuthService) {}
 
   async listUnreadMessageIds(maxResults = 10): Promise<string[]> {
     const gmail = this.getGmailClient();
-    const userId = this.getUserId();
 
     const response = await gmail.users.messages.list({
-      userId,
+      userId: 'me',
       maxResults,
       q: 'is:unread in:inbox',
     });
@@ -24,10 +25,9 @@ export class GmailService {
 
   async getMessage(gmailMessageId: string): Promise<EmailMessage> {
     const gmail = this.getGmailClient();
-    const userId = this.getUserId();
 
     const response = await gmail.users.messages.get({
-      userId,
+      userId: 'me',
       id: gmailMessageId,
       format: 'full',
     });
@@ -45,15 +45,27 @@ export class GmailService {
     return Promise.all(messageIds.map((id) => this.getMessage(id)));
   }
 
-  private getGmailClient() {
-    return google.gmail({
-      version: 'v1',
-      auth: this.authService.getAuthenticatedClient(),
+  async markAsRead(gmailMessageId: string): Promise<void> {
+    const gmail = this.getGmailClient();
+
+    await gmail.users.messages.modify({
+      userId: 'me',
+      id: gmailMessageId,
+      requestBody: {
+        removeLabelIds: ['UNREAD'],
+      },
     });
   }
 
-  private getUserId(): string {
-    return 'me';
+  private getGmailClient(): gmail_v1.Gmail {
+    if (!this.gmailClient) {
+      this.gmailClient = google.gmail({
+        version: 'v1',
+        auth: this.authService.getAuthenticatedClient(),
+      });
+    }
+
+    return this.gmailClient;
   }
 }
 

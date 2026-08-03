@@ -19,6 +19,8 @@ export const envSchema = z.object({
   DB_TRUST_SERVER_CERTIFICATE: booleanFromEnv.default('true'),
 
   EMAIL_POLL_INTERVAL_MS: z.coerce.number().int().positive().default(60_000),
+  WORKER_ENABLED: booleanFromEnv.default('true'),
+  WORKER_MAX_MESSAGES_PER_POLL: z.coerce.number().int().positive().max(50).default(10),
 
   GMAIL_CLIENT_ID: optionalNonEmptyString,
   GMAIL_CLIENT_SECRET: optionalNonEmptyString,
@@ -26,19 +28,13 @@ export const envSchema = z.object({
   GMAIL_USER_EMAIL: z.string().email().optional(),
   GMAIL_REDIRECT_URI: z.string().url().default('http://localhost:3000/auth/gmail/callback'),
 
-  ORDER_SYSTEM_API_URL: z.string().optional(),
-  ORDER_SYSTEM_API_KEY: optionalNonEmptyString,
-
-  AI_PROVIDER: z.enum(['gemini', 'openai']).default('gemini'),
-  GEMINI_API_KEY: optionalNonEmptyString,
-  GEMINI_MODEL: z.string().min(1).default('gemini-2.0-flash-lite'),
-  OPENAI_API_KEY: optionalNonEmptyString,
-  AI_MODEL: z.string().min(1).default('gpt-4o-mini'),
+  OLLAMA_BASE_URL: z.string().url().default('http://localhost:11434'),
+  OLLAMA_MODEL: z.string().min(1).default('llama3.2'),
+  OLLAMA_ENABLED: booleanFromEnv.default('true'),
   AI_CONFIDENCE_THRESHOLD: z.coerce.number().min(0).max(1).default(0.7),
 });
 
 export type RawEnv = z.infer<typeof envSchema>;
-export type AiProvider = RawEnv['AI_PROVIDER'];
 
 export interface Env {
   nodeEnv: RawEnv['NODE_ENV'];
@@ -54,6 +50,8 @@ export interface Env {
   };
   email: {
     pollIntervalMs: number;
+    workerEnabled: boolean;
+    workerMaxMessagesPerPoll: number;
     gmail: {
       clientId?: string;
       clientSecret?: string;
@@ -62,16 +60,10 @@ export interface Env {
       redirectUri: string;
     };
   };
-  orderSystem: {
-    apiUrl?: string;
-    apiKey?: string;
-  };
   ai: {
-    provider: AiProvider;
-    geminiApiKey?: string;
-    geminiModel: string;
-    openaiApiKey?: string;
-    openaiModel: string;
+    ollamaEnabled: boolean;
+    ollamaBaseUrl: string;
+    ollamaModel: string;
     confidenceThreshold: number;
   };
 }
@@ -91,6 +83,8 @@ export function mapRawEnvToConfig(raw: RawEnv): Env {
     },
     email: {
       pollIntervalMs: raw.EMAIL_POLL_INTERVAL_MS,
+      workerEnabled: raw.WORKER_ENABLED,
+      workerMaxMessagesPerPoll: raw.WORKER_MAX_MESSAGES_PER_POLL,
       gmail: {
         clientId: raw.GMAIL_CLIENT_ID,
         clientSecret: raw.GMAIL_CLIENT_SECRET,
@@ -99,16 +93,10 @@ export function mapRawEnvToConfig(raw: RawEnv): Env {
         redirectUri: raw.GMAIL_REDIRECT_URI,
       },
     },
-    orderSystem: {
-      apiUrl: raw.ORDER_SYSTEM_API_URL || undefined,
-      apiKey: raw.ORDER_SYSTEM_API_KEY,
-    },
     ai: {
-      provider: raw.AI_PROVIDER,
-      geminiApiKey: raw.GEMINI_API_KEY,
-      geminiModel: raw.GEMINI_MODEL,
-      openaiApiKey: raw.OPENAI_API_KEY,
-      openaiModel: raw.AI_MODEL,
+      ollamaEnabled: raw.OLLAMA_ENABLED,
+      ollamaBaseUrl: raw.OLLAMA_BASE_URL,
+      ollamaModel: raw.OLLAMA_MODEL,
       confidenceThreshold: raw.AI_CONFIDENCE_THRESHOLD,
     },
   };

@@ -1,4 +1,4 @@
-import type { AiProvider, Env } from './env.schema.js';
+import type { Env } from './env.schema.js';
 
 export class AiConfigError extends Error {
   constructor(message: string) {
@@ -8,11 +8,7 @@ export class AiConfigError extends Error {
 }
 
 export function isAiConfigured(ai: Env['ai']): boolean {
-  if (ai.provider === 'gemini') {
-    return Boolean(ai.geminiApiKey);
-  }
-
-  return Boolean(ai.openaiApiKey);
+  return ai.ollamaEnabled && Boolean(ai.ollamaBaseUrl && ai.ollamaModel);
 }
 
 export function assertAiConfigured(ai: Env['ai']): void {
@@ -20,17 +16,7 @@ export function assertAiConfigured(ai: Env['ai']): void {
     return;
   }
 
-  if (ai.provider === 'gemini') {
-    throw new AiConfigError(
-      'Gemini não configurado. Defina GEMINI_API_KEY no .env para usar o parser LLM',
-    );
-  }
-
   throw new AiConfigError(
-    'OpenAI não configurada. Defina OPENAI_API_KEY no .env para usar o parser LLM',
+    'Ollama desativado ou incompleto. Defina OLLAMA_ENABLED=true, OLLAMA_BASE_URL e OLLAMA_MODEL no .env',
   );
-}
-
-export function getActiveAiProvider(ai: Env['ai']): AiProvider {
-  return ai.provider;
 }

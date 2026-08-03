@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { gmailAuthService } from '../services/gmail-auth.service.js';
 import { GmailConfigError } from '../config/gmail.config.js';
+import { escapeHtml, getErrorMessage } from '../utils/error.js';
 
 export const gmailAuthRouter = Router();
 
@@ -14,7 +15,7 @@ gmailAuthRouter.get('/', (_req, res) => {
       return;
     }
 
-    throw error;
+    res.status(500).json({ error: getErrorMessage(error, 'Erro ao iniciar OAuth') });
   }
 });
 
@@ -44,8 +45,7 @@ gmailAuthRouter.get('/callback', async (req, res) => {
       scope: tokens.scope ?? undefined,
     }));
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao trocar código OAuth';
-    res.status(500).json({ error: message });
+    res.status(500).json({ error: getErrorMessage(error, 'Erro ao trocar código OAuth') });
   }
 });
 
@@ -60,7 +60,7 @@ function renderCallbackPage(input: {
       <html>
         <body style="font-family: sans-serif; padding: 2rem;">
           <h1>OAuth Gmail — erro</h1>
-          <p>${input.message}</p>
+          <p>${escapeHtml(input.message ?? 'Erro desconhecido')}</p>
         </body>
       </html>
     `;
@@ -71,8 +71,8 @@ function renderCallbackPage(input: {
       <body style="font-family: sans-serif; padding: 2rem; max-width: 720px;">
         <h1>OAuth Gmail — sucesso</h1>
         <p>Copie o <strong>GMAIL_REFRESH_TOKEN</strong> abaixo para o seu arquivo <code>.env</code>:</p>
-        <pre style="background: #f4f4f4; padding: 1rem; overflow-x: auto;">GMAIL_REFRESH_TOKEN=${input.refreshToken}</pre>
-        ${input.scope ? `<p><strong>Scope:</strong> ${input.scope}</p>` : ''}
+        <pre style="background: #f4f4f4; padding: 1rem; overflow-x: auto;">GMAIL_REFRESH_TOKEN=${escapeHtml(input.refreshToken ?? '')}</pre>
+        ${input.scope ? `<p><strong>Scope:</strong> ${escapeHtml(input.scope)}</p>` : ''}
         <p>Reinicie o servidor após salvar o <code>.env</code>.</p>
       </body>
     </html>

@@ -85,10 +85,11 @@ Copie `.env.example` para `.env`. A senha `DB_PASSWORD` deve ser a mesma do `doc
 | `DB_PORT` | Sim (default `14333`) | Porta mapeada no host |
 | `DB_SERVER`, `DB_DATABASE`, `DB_USER` | Sim (com defaults) | Conexão com o banco |
 | `GMAIL_*` | Parcial | OAuth na Task 3 — ver [docs/gmail-oauth.md](docs/gmail-oauth.md) |
-| `GEMINI_API_KEY` | Não (Task 5) | API key do Google Gemini (fallback LLM) |
-| `AI_PROVIDER` | Não | `gemini` (padrão) ou `openai` |
-| `OPENAI_API_KEY` | Não (Task 5) | API key OpenAI (alternativa) |
-| `ORDER_SYSTEM_*` | Não (Task 6) | Integração com sistema de pedidos |
+| `EMAIL_POLL_INTERVAL_MS` | Não (default 60s) | Intervalo do worker de e-mails |
+| `WORKER_ENABLED` | Não (default `true`) | Liga/desliga polling automático |
+| `OLLAMA_ENABLED` | Não (default `true`) | Habilita fallback Ollama no parser |
+| `OLLAMA_BASE_URL` | Não (Task 5) | URL do Ollama local (default `http://localhost:11434`) |
+| `OLLAMA_MODEL` | Não (Task 5) | Modelo Ollama (default `llama3.2`) |
 
 ## Endpoints
 
@@ -98,7 +99,7 @@ Copie `.env.example` para `.env`. A senha `DB_PASSWORD` deve ser a mesma do `doc
 - `GET /gmail/messages/:id/parse` — Parseia e-mail do Gmail e salva no banco
 - `POST /parser/parse` — Parseia e salva pedido no banco (teste manual)
 
-Guia OAuth: [docs/gmail-oauth.md](docs/gmail-oauth.md) · Parser: [docs/parser.md](docs/parser.md)
+Guia OAuth: [docs/gmail-oauth.md](docs/gmail-oauth.md) · Parser: [docs/parser.md](docs/parser.md) · **Fluxo completo:** [docs/fluxo.md](docs/fluxo.md)
 
 ## Tasks
 
@@ -106,8 +107,8 @@ Guia OAuth: [docs/gmail-oauth.md](docs/gmail-oauth.md) · Parser: [docs/parser.m
 - [x] Task 1 — Banco de dados (SQL Server)
 - [x] Task 2 — Validação de ambiente (Zod)
 - [x] Task 3 — Gmail API (OAuth)
-- [x] Task 5 — Parser híbrido (regex + LLM)
-- [ ] Task 4 — Classificador de e-mail
-- [ ] Task 6 — Integração com sistema de pedidos
-- [ ] Task 7 — Orquestrador / Worker
-- [ ] Task 8 — Tratamento de erros e revisão manual
+- [x] Task 5 — Parser híbrido (regex + Ollama)
+- [x] Task 7 — Worker (polling Gmail automático)
+- [ ] Task 4 — Classificador de e-mail (opcional — parser já filtra)
+- [ ] Task 6 — Integração externa (não necessário para projeto teste)
+- [ ] Task 8 — Revisão manual (opcional)

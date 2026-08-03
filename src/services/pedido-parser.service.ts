@@ -32,7 +32,7 @@ export class PedidoParserService {
         success: false,
         error:
           regexResult.error ??
-          `Parser regex com baixa confiança e LLM (${env.ai.provider}) não configurado`,
+          `Parser regex com baixa confiança e Ollama não está habilitado`,
       };
     }
 

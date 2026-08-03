@@ -1,7 +1,12 @@
 import { Router } from 'express';
+import {
+  DEFAULT_GMAIL_MESSAGES_PER_REQUEST,
+  MAX_GMAIL_MESSAGES_PER_REQUEST,
+} from '../config/gmail.constants.js';
 import { GmailConfigError } from '../config/gmail.config.js';
 import { parseAndSavePedido } from '../services/email-processing.service.js';
 import { gmailService } from '../services/gmail.service.js';
+import { getErrorMessage } from '../utils/error.js';
 
 export const gmailRouter = Router();
 
@@ -20,8 +25,7 @@ gmailRouter.get('/messages/unread', async (req, res) => {
       return;
     }
 
-    const message = error instanceof Error ? error.message : 'Erro ao listar e-mails';
-    res.status(500).json({ error: message });
+    res.status(500).json({ error: getErrorMessage(error, 'Erro ao listar e-mails') });
   }
 });
 
@@ -42,20 +46,19 @@ gmailRouter.get('/messages/:messageId/parse', async (req, res) => {
       return;
     }
 
-    const message = error instanceof Error ? error.message : 'Erro ao processar e-mail';
-    res.status(500).json({ error: message });
+    res.status(500).json({ error: getErrorMessage(error, 'Erro ao processar e-mail') });
   }
 });
 
 function parseMaxResults(value: unknown): number {
   if (typeof value !== 'string') {
-    return 10;
+    return DEFAULT_GMAIL_MESSAGES_PER_REQUEST;
   }
 
   const parsed = Number(value);
 
-  if (!Number.isInteger(parsed) || parsed <= 0 || parsed > 50) {
-    return 10;
+  if (!Number.isInteger(parsed) || parsed <= 0 || parsed > MAX_GMAIL_MESSAGES_PER_REQUEST) {
+    return DEFAULT_GMAIL_MESSAGES_PER_REQUEST;
   }
 
   return parsed;

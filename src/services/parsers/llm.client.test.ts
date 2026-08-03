@@ -3,32 +3,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('../../config/env.js', () => ({
   env: {
     ai: {
-      provider: 'gemini',
-      geminiApiKey: 'test-gemini-key',
-      geminiModel: 'gemini-2.0-flash-lite',
-      openaiApiKey: undefined,
-      openaiModel: 'gpt-4o-mini',
+      ollamaEnabled: true,
+      ollamaBaseUrl: 'http://localhost:11434',
+      ollamaModel: 'llama3.2',
+      confidenceThreshold: 0.7,
     },
   },
 }));
 
-import { callGemini } from './llm.client.js';
+import { callOllama } from './llm.client.js';
 
-const quotaErrorBody = JSON.stringify({
-  error: {
-    code: 429,
-    message: 'You exceeded your current quota, please check your plan and billing details.',
-    status: 'RESOURCE_EXHAUSTED',
-    details: [
-      {
-        '@type': 'type.googleapis.com/google.rpc.RetryInfo',
-        retryDelay: '2s',
-      },
-    ],
-  },
-});
-
-describe('callGemini', () => {
+describe('callOllama', () => {
   afterEach(() => {
     vi.restoreAllMocks();
   });
@@ -37,36 +22,33 @@ describe('callGemini', () => {
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
       new Response(
         JSON.stringify({
-          candidates: [
-            {
-              content: {
-                parts: [{ text: '{"confianca":0.9,"itens":[]}' }],
-              },
-            },
-          ],
+          message: {
+            content: '{"confianca":0.9,"itens":[]}',
+          },
         }),
         { status: 200 },
       ),
     );
 
-    const result = await callGemini('extrair pedido');
+    const result = await callOllama('Assunto: pedido\nCorpo: 10 parafusos');
 
     expect(fetchMock).toHaveBeenCalledOnce();
     expect(result).toContain('confianca');
-    const calledUrl = String(fetchMock.mock.calls[0][0]);
-    expect(calledUrl).toContain('generativelanguage.googleapis.com');
-    expect(calledUrl).toContain('gemini-2.0-flash-lite');
+
+    const [calledUrl, options] = fetchMock.mock.calls[0];
+    expect(String(calledUrl)).toBe('http://localhost:11434/api/chat');
+
+    const body = JSON.parse(String(options?.body));
+    expect(body.model).toBe('llama3.2');
+    expect(body.format).toBe('json');
+    expect(body.stream).toBe(false);
+    expect(body.messages[0].role).toBe('system');
+    expect(body.messages[1].content).toContain('parafusos');
   });
 
-  it('não retenta após 429', async () => {
-    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
-      new Response(quotaErrorBody, { status: 429 }),
-    );
+  it('retorna erro amigável quando Ollama não está acessível', async () => {
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('ECONNREFUSED'));
 
-    await expect(callGemini('extrair pedido')).rejects.toThrow(
-      /Cota do Gemini \(free tier\) excedida/,
-    );
-
-    expect(fetchMock).toHaveBeenCalledOnce();
+    await expect(callOllama('teste')).rejects.toThrow(/Falha ao conectar com Ollama/);
   });
 });

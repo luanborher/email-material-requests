@@ -5,7 +5,7 @@ import type { EmailMessage, ParsedPedidoData } from '../../types/email.js';
 import type { ParsePedidoResult } from '../../types/parser.js';
 import { ParserType } from '../../types/enums.js';
 import { normalizeEmailBody } from '../../utils/email-text.js';
-import { callGemini, callOpenAi } from './llm.client.js';
+import { callOllama } from './llm.client.js';
 
 const llmResponseSchema = z.object({
   solicitanteNome: z.string().nullable().optional(),
@@ -32,7 +32,7 @@ export class LlmPedidoParser {
 
     const body = normalizeEmailBody(email.body);
     const prompt = this.buildPrompt(email, body);
-    const content = await this.callLlm(prompt);
+    const content = await callOllama(prompt);
     const parsedJson = this.extractJson(content);
     const validated = llmResponseSchema.safeParse(parsedJson);
 
@@ -55,14 +55,6 @@ export class LlmPedidoParser {
     };
 
     return { success: true, data };
-  }
-
-  private async callLlm(prompt: string): Promise<string> {
-    if (env.ai.provider === 'gemini') {
-      return callGemini(prompt);
-    }
-
-    return callOpenAi(prompt);
   }
 
   private buildPrompt(email: EmailMessage, body: string): string {

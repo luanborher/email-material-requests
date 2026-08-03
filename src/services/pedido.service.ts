@@ -1,3 +1,7 @@
+import {
+  toCreatePedidoInput,
+  toCreatePedidoItemInputs,
+} from '../database/mappers/pedido-input.mapper.js';
 import type { PedidoItemRepository } from '../repositories/pedido-item.repository.js';
 import type { PedidoRepository } from '../repositories/pedido.repository.js';
 import type {
@@ -6,6 +10,7 @@ import type {
   ProcessarPedidoResult,
 } from '../types/email.js';
 import { PedidoStatus } from '../types/enums.js';
+import { isUniqueConstraintError } from '../utils/db-error.js';
 
 export class PedidoService {
   constructor(
@@ -20,32 +25,29 @@ export class PedidoService {
       return { pedido: existente, itens: [], skipped: true };
     }
 
-    const pedido = await this.pedidos.create({
-      gmailMessageId: email.gmailMessageId,
-      emailThreadId: email.threadId,
-      emailSubject: email.subject,
-      emailSender: email.sender,
-      emailReceivedAt: email.receivedAt,
-      solicitanteNome: dados.solicitanteNome,
-      solicitanteEmail: dados.solicitanteEmail,
-      departamento: dados.departamento,
-      urgencia: dados.urgencia,
-      observacoes: dados.observacoes,
-      status: PedidoStatus.PROCESSING,
-      parserTipo: dados.parserTipo,
-      parserConfianca: dados.parserConfianca,
-    });
+    try {
+      return await this.criarPedidoCompleto(email, dados);
+    } catch (error) {
+      if (isUniqueConstraintError(error)) {
+        const duplicado = await this.pedidos.findByGmailMessageId(email.gmailMessageId);
+
+        if (duplicado) {
+          return { pedido: duplicado, itens: [], skipped: true };
+        }
+      }
+
+      throw error;
+    }
+  }
+
+  private async criarPedidoCompleto(
+    email: EmailMessage,
+    dados: ParsedPedidoData,
+  ): Promise<ProcessarPedidoResult> {
+    const pedido = await this.pedidos.create(toCreatePedidoInput(email, dados));
 
     try {
-      const itens = await this.pedidoItens.createMany(
-        dados.itens.map((item) => ({
-          pedidoId: pedido.id,
-          materialCodigo: item.materialCodigo,
-          materialDescricao: item.materialDescricao,
-          quantidade: item.quantidade,
-          unidade: item.unidade,
-        })),
-      );
+      const itens = await this.pedidoItens.createMany(toCreatePedidoItemInputs(pedido.id, dados));
 
       const pedidoAtualizado = await this.pedidos.updateStatus(pedido.id, {
         status: PedidoStatus.COMPLETED,
@@ -53,8 +55,12 @@ export class PedidoService {
         parserConfianca: dados.parserConfianca,
       });
 
+      if (!pedidoAtualizado) {
+        throw new Error(`Pedido ${pedido.id} não encontrado após salvar itens`);
+      }
+
       return {
-        pedido: pedidoAtualizado ?? pedido,
+        pedido: pedidoAtualizado,
         itens,
         skipped: false,
       };

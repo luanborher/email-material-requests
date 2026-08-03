@@ -2,5 +2,5 @@ export const GMAIL_SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
 ] as const;
 
-export const GMAIL_OAUTH_PATH = '/auth/gmail';
-export const GMAIL_OAUTH_CALLBACK_PATH = '/auth/gmail/callback';
+export const MAX_GMAIL_MESSAGES_PER_REQUEST = 50;
+export const DEFAULT_GMAIL_MESSAGES_PER_REQUEST = 10;

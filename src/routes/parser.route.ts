@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { parseAndSavePedido } from '../services/email-processing.service.js';
 import type { EmailMessage } from '../types/email.js';
+import { getErrorMessage } from '../utils/error.js';
 
 export const parserRouter = Router();
 
@@ -24,8 +25,7 @@ parserRouter.post('/parse', async (req, res) => {
 
     res.json({ ...parsed, saved });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Erro ao salvar pedido';
-    res.status(500).json({ error: message });
+    res.status(500).json({ error: getErrorMessage(error, 'Erro ao salvar pedido') });
   }
 });
 
@@ -40,13 +40,31 @@ function parseEmailFromBody(body: unknown): EmailMessage | null {
     return null;
   }
 
+  const receivedAt = parseReceivedAt(input.receivedAt);
+
   return {
     gmailMessageId:
-      typeof input.gmailMessageId === 'string' ? input.gmailMessageId : `manual-${Date.now()}`,
+      typeof input.gmailMessageId === 'string'
+        ? input.gmailMessageId
+        : `manual-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
     threadId: typeof input.threadId === 'string' ? input.threadId : null,
     subject: typeof input.subject === 'string' ? input.subject : null,
     sender: input.sender,
-    receivedAt: input.receivedAt ? new Date(String(input.receivedAt)) : new Date(),
+    receivedAt,
     body: input.body,
   };
+}
+
+function parseReceivedAt(value: unknown): Date {
+  if (!value) {
+    return new Date();
+  }
+
+  const parsed = new Date(String(value));
+
+  if (Number.isNaN(parsed.getTime())) {
+    return new Date();
+  }
+
+  return parsed;
 }

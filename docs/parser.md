@@ -9,7 +9,7 @@ E-mail
   → normaliza texto (remove HTML)
   → tenta regex
       ├─ confiança >= 0.7 → usa regex
-      └─ confiança < 0.7 → chama LLM (se configurado)
+      └─ confiança < 0.7 → chama Ollama (local)
   → salva pedido + itens no SQL Server (idempotente por gmail_message_id)
 ```
 
@@ -63,29 +63,32 @@ SELECT * FROM dbo.pedidos ORDER BY created_at DESC;
 SELECT * FROM dbo.pedido_itens WHERE pedido_id = '<id-do-pedido>';
 ```
 
-## Variáveis de ambiente (LLM fallback)
+## Ollama (LLM local)
 
-### Gemini (recomendado — free tier)
+Instale Ollama: [ollama.com](https://ollama.com)
+
+```bash
+ollama pull llama3.2
+```
+
+Variáveis no `.env`:
 
 ```env
-AI_PROVIDER=gemini
-GEMINI_API_KEY=sua-chave-do-google-ai-studio
-GEMINI_MODEL=gemini-2.0-flash-lite
+OLLAMA_ENABLED=true
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.2
 AI_CONFIDENCE_THRESHOLD=0.7
 ```
 
-Obtenha a key em: [aistudio.google.com](https://aistudio.google.com)
+Com `OLLAMA_ENABLED=false`, o sistema usa somente regex.
 
-### OpenAI (alternativa)
+Se o app roda em Docker e Ollama na máquina host (Windows):
 
 ```env
-AI_PROVIDER=openai
-OPENAI_API_KEY=sk-...
-AI_MODEL=gpt-4o-mini
-AI_CONFIDENCE_THRESHOLD=0.7
+OLLAMA_BASE_URL=http://host.docker.internal:11434
 ```
 
-Sem chave de LLM configurada, o sistema usa **somente regex**.
+Sem Ollama rodando, o fallback LLM falha — e-mails com baixa confiança no regex retornam erro ou o melhor resultado do regex (se houver).
 
 ## Endpoints
 

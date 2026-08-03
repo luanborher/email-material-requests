@@ -7,7 +7,10 @@ const PEDIDO_KEYWORDS = /pedido|solicita[cç][aã]o|requisi[cç][aã]o|material|
 
 const DEPARTAMENTO_PATTERN = /departamento\s*:\s*(.+)/i;
 const URGENCIA_PATTERN = /urg[êe]ncia\s*:\s*(alta|m[eé]dia|baixa)/i;
-const OBRA_PATTERN = /obra\s*:\s*(.+)/i;
+const OBSERVACOES_PATTERNS = [
+  /observa[cç][oõ]es?\s*:\s*(.+)/i,
+  /obra\s*:\s*(.+)/i,
+];
 
 const ITEM_PATTERNS = [
   /^[-*•]\s*(\d+(?:[.,]\d+)?)\s+(.+)$/i,
@@ -31,7 +34,7 @@ export class RegexPedidoParser {
 
     const departamento = this.extractMatch(body, DEPARTAMENTO_PATTERN);
     const urgencia = this.extractUrgency(body);
-    const observacoes = this.extractMatch(body, OBRA_PATTERN);
+    const observacoes = this.extractObservacoes(body);
     const confianca = this.calculateConfidence({
       subject,
       body,
@@ -77,20 +80,41 @@ export class RegexPedidoParser {
 
       if (match.length === 3) {
         const [, quantityRaw, description] = match;
-        return {
-          materialDescricao: description.trim(),
-          quantidade: parseQuantity(quantityRaw),
-          unidade: this.extractUnitFromDescription(description),
-        };
+
+        try {
+          return {
+            materialDescricao: description.trim(),
+            quantidade: parseQuantity(quantityRaw),
+            unidade: this.extractUnitFromDescription(description),
+          };
+        } catch {
+          return null;
+        }
       }
 
       if (match.length === 4) {
         const [, quantityRaw, unit, description] = match;
-        return {
-          materialDescricao: description.trim(),
-          quantidade: parseQuantity(quantityRaw),
-          unidade: unit.toLowerCase(),
-        };
+
+        try {
+          return {
+            materialDescricao: description.trim(),
+            quantidade: parseQuantity(quantityRaw),
+            unidade: unit.toLowerCase(),
+          };
+        } catch {
+          return null;
+        }
+      }
+    }
+
+    return null;
+  }
+
+  private extractObservacoes(body: string): string | null {
+    for (const pattern of OBSERVACOES_PATTERNS) {
+      const match = this.extractMatch(body, pattern);
+      if (match) {
+        return match;
       }
     }
 
