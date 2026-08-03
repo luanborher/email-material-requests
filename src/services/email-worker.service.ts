@@ -1,6 +1,6 @@
-import type { GmailService } from './gmail.service.js';
-import { parseAndSavePedido } from './email-processing.service.js';
-import { getErrorMessage } from '../utils/error.js';
+import type { GmailService } from "./gmail.service.js";
+import { parseAndSavePedido } from "./email-processing.service.js";
+import { getErrorMessage } from "../utils/error.js";
 
 interface WorkerCycleError {
   messageId: string;
@@ -56,6 +56,9 @@ export class EmailWorkerService {
     }
   }
 
+  /**
+   * Lista não lidos, processa cada um e retorna métricas
+   */
   async runCycle(): Promise<WorkerCycleResult> {
     const result: WorkerCycleResult = {
       processed: 0,
@@ -89,7 +92,13 @@ export class EmailWorkerService {
     return result;
   }
 
-  private async processMessage(messageId: string, result: WorkerCycleResult): Promise<void> {
+  /**
+   * Processo: Busca e-mail, parse, save e marca lido
+   */
+  private async processMessage(
+    messageId: string,
+    result: WorkerCycleResult,
+  ): Promise<void> {
     const email = await this.gmailService.getMessage(messageId);
     const { parsed, saved } = await parseAndSavePedido(email);
 
@@ -97,7 +106,7 @@ export class EmailWorkerService {
       result.failed += 1;
       result.errors.push({
         messageId,
-        error: parsed.error ?? 'Falha no parse do e-mail',
+        error: parsed.error ?? "Falha no parse do e-mail",
       });
       return;
     }
@@ -106,7 +115,7 @@ export class EmailWorkerService {
       result.failed += 1;
       result.errors.push({
         messageId,
-        error: 'Parse sem dados para salvar',
+        error: "Parse sem dados para salvar",
       });
       return;
     }

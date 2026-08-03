@@ -1,9 +1,9 @@
-import { env } from '../config/env.js';
-import { isAiConfigured } from '../config/ai.config.js';
-import type { EmailMessage } from '../types/email.js';
-import type { ParsePedidoResult } from '../types/parser.js';
-import { LlmPedidoParser } from './parsers/llm-pedido.parser.js';
-import { RegexPedidoParser } from './parsers/regex-pedido.parser.js';
+import { env } from "../config/env.js";
+import { isAiConfigured } from "../config/ai.config.js";
+import type { EmailMessage } from "../types/email.js";
+import type { ParsePedidoResult } from "../types/parser.js";
+import { LlmPedidoParser } from "./parsers/llm-pedido.parser.js";
+import { RegexPedidoParser } from "./parsers/regex-pedido.parser.js";
 
 export class PedidoParserService {
   constructor(
@@ -12,6 +12,7 @@ export class PedidoParserService {
     private readonly confidenceThreshold: number,
   ) {}
 
+  // regex, fallback para LLM
   async parse(email: EmailMessage): Promise<ParsePedidoResult> {
     const regexResult = this.regexParser.parse(email);
 
@@ -55,7 +56,7 @@ export class PedidoParserService {
 
       return {
         success: false,
-        error: error instanceof Error ? error.message : 'Erro no parser LLM',
+        error: error instanceof Error ? error.message : "Erro no parser LLM",
       };
     }
   }

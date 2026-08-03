@@ -1,17 +1,17 @@
-import { z } from 'zod';
-import { env } from '../../config/env.js';
-import { assertAiConfigured } from '../../config/ai.config.js';
-import type { EmailMessage, ParsedPedidoData } from '../../types/email.js';
-import type { ParsePedidoResult } from '../../types/parser.js';
-import { ParserType } from '../../types/enums.js';
-import { normalizeEmailBody } from '../../utils/email-text.js';
-import { callOllama } from './llm.client.js';
+import { z } from "zod";
+import { env } from "../../config/env.js";
+import { assertAiConfigured } from "../../config/ai.config.js";
+import type { EmailMessage, ParsedPedidoData } from "../../types/email.js";
+import type { ParsePedidoResult } from "../../types/parser.js";
+import { ParserType } from "../../types/enums.js";
+import { normalizeEmailBody } from "../../utils/email-text.js";
+import { callOllama } from "./llm.client.js";
 
 const llmResponseSchema = z.object({
   solicitanteNome: z.string().nullable().optional(),
   solicitanteEmail: z.string().nullable().optional(),
   departamento: z.string().nullable().optional(),
-  urgencia: z.enum(['low', 'medium', 'high']).nullable().optional(),
+  urgencia: z.enum(["low", "medium", "high"]).nullable().optional(),
   observacoes: z.string().nullable().optional(),
   confianca: z.number().min(0).max(1),
   itens: z
@@ -39,7 +39,7 @@ export class LlmPedidoParser {
     if (!validated.success) {
       return {
         success: false,
-        error: 'Resposta do LLM em formato inválido',
+        error: "Resposta do LLM em formato inválido",
       };
     }
 
@@ -58,7 +58,7 @@ export class LlmPedidoParser {
   }
 
   private buildPrompt(email: EmailMessage, body: string): string {
-    return `Assunto: ${email.subject ?? '-'}
+    return `Assunto: ${email.subject ?? "-"}
 De: ${email.sender}
 Corpo:
 ${body}`;
@@ -72,7 +72,7 @@ ${body}`;
     } catch {
       const match = trimmed.match(/\{[\s\S]*\}/);
       if (!match) {
-        throw new Error('JSON não encontrado na resposta do LLM');
+        throw new Error("JSON não encontrado na resposta do LLM");
       }
 
       return JSON.parse(match[0]);
