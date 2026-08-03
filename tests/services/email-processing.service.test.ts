@@ -1,22 +1,22 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { EmailMessage, ParsedPedidoData } from '../types/email.js';
-import { ParserType } from '../types/enums.js';
+import type { EmailMessage, ParsedPedidoData } from '../../src/types/email.js';
+import { ParserType } from '../../src/types/enums.js';
 
-vi.mock('./pedido-parser.service.js', () => ({
+vi.mock('../../src/services/pedido-parser.service.js', () => ({
   pedidoParserService: {
     parse: vi.fn(),
   },
 }));
 
-vi.mock('./pedido.service.instance.js', () => ({
+vi.mock('../../src/services/pedido.service.instance.js', () => ({
   pedidoService: {
     processarEmail: vi.fn(),
   },
 }));
 
-import { parseAndSavePedido } from './email-processing.service.js';
-import { pedidoParserService } from './pedido-parser.service.js';
-import { pedidoService } from './pedido.service.instance.js';
+import { parseAndSavePedido } from '../../src/services/email-processing.service.js';
+import { pedidoParserService } from '../../src/services/pedido-parser.service.js';
+import { pedidoService } from '../../src/services/pedido.service.instance.js';
 
 const email: EmailMessage = {
   gmailMessageId: 'msg-001',

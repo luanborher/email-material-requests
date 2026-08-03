@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { GmailService } from './gmail.service.js';
-import type { GmailAuthService } from './gmail-auth.service.js';
+import { GmailService } from '../../src/services/gmail.service.js';
+import type { GmailAuthService } from '../../src/services/gmail-auth.service.js';
 
 const getMock = vi.fn();
 const listMock = vi.fn();

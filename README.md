@@ -49,8 +49,12 @@ Pronto. Acesse `http://localhost:3000/health` — deve retornar `"database": { "
 database/
 └── migrations/          # Scripts SQL (aplicados automaticamente pelo Docker)
 
+tests/                   # Testes (Vitest) — ver tests/README.md
+├── fixtures/
+├── services/
+└── utils/
+
 src/
-├── config/              # Variáveis de ambiente (importar de config/env.js)
 ├── database/            # Pool de conexão e mappers
 ├── repositories/        # Acesso a dados
 ├── routes/              # Rotas HTTP (Express)

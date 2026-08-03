@@ -1,34 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { RegexPedidoParser } from './regex-pedido.parser.js';
-import { ParserType, UrgencyLevel } from '../../types/enums.js';
-import type { EmailMessage } from '../../types/email.js';
+import { RegexPedidoParser } from '../../../src/services/parsers/regex-pedido.parser.js';
+import { ParserType, UrgencyLevel } from '../../../src/types/enums.js';
+import { emailPedidoEstruturado } from '../../fixtures/email.js';
 
 const parser = new RegexPedidoParser();
 
-const emailPedido: EmailMessage = {
-  gmailMessageId: 'test-001',
-  subject: 'Solicitação de material - Obra 42',
-  sender: 'joao.silva@empresa.com',
-  receivedAt: new Date('2026-07-30T12:00:00.000Z'),
-  body: `
-    Olá,
-
-    Preciso dos seguintes materiais:
-    - 10 parafusos M8
-    - 5 metros de cabo PP 2,5mm
-
-    Departamento: Manutenção
-    Urgência: alta
-    Obra: 42
-
-    Att,
-    João
-  `,
-};
-
 describe('RegexPedidoParser', () => {
   it('extrai itens e metadados de e-mail estruturado', () => {
-    const result = parser.parse(emailPedido);
+    const result = parser.parse(emailPedidoEstruturado);
 
     expect(result.success).toBe(true);
     expect(result.data?.parserTipo).toBe(ParserType.REGEX);
@@ -43,7 +22,7 @@ describe('RegexPedidoParser', () => {
 
   it('falha quando não encontra itens', () => {
     const result = parser.parse({
-      ...emailPedido,
+      ...emailPedidoEstruturado,
       body: 'Olá, tudo bem? Sem pedido aqui.',
     });
 

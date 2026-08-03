@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../config/env.js', () => ({
+vi.mock('../../../src/config/env.js', () => ({
   env: {
     ai: {
       ollamaEnabled: true,
@@ -11,7 +11,7 @@ vi.mock('../../config/env.js', () => ({
   },
 }));
 
-import { callOllama } from './llm.client.js';
+import { callOllama } from '../../../src/services/parsers/llm.client.js';
 
 describe('callOllama', () => {
   afterEach(() => {

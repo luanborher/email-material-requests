@@ -1,22 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../config/ai.config.js', () => ({
+vi.mock('../../src/config/ai.config.js', () => ({
   isAiConfigured: () => true,
 }));
 
-import { PedidoParserService } from './pedido-parser.service.js';
-import { RegexPedidoParser } from './parsers/regex-pedido.parser.js';
-import type { LlmPedidoParser } from './parsers/llm-pedido.parser.js';
-import { ParserType } from '../types/enums.js';
-import type { EmailMessage } from '../../types/email.js';
-
-const email: EmailMessage = {
-  gmailMessageId: 'test-001',
-  subject: 'Pedido de material',
-  sender: 'joao@empresa.com',
-  receivedAt: new Date(),
-  body: '- 2 tintas brancas',
-};
+import { PedidoParserService } from '../../src/services/pedido-parser.service.js';
+import { RegexPedidoParser } from '../../src/services/parsers/regex-pedido.parser.js';
+import type { LlmPedidoParser } from '../../src/services/parsers/llm-pedido.parser.js';
+import { ParserType } from '../../src/types/enums.js';
+import { emailPedidoSimples } from '../fixtures/email.js';
 
 describe('PedidoParserService', () => {
   const regexParser = new RegexPedidoParser();
@@ -31,8 +23,8 @@ describe('PedidoParserService', () => {
   });
 
   it('usa regex quando confiança é alta o suficiente', async () => {
-    const highConfidenceEmail: EmailMessage = {
-      ...email,
+    const highConfidenceEmail = {
+      ...emailPedidoSimples,
       body: `
         Solicitação de material
         - 10 parafusos M8
@@ -60,7 +52,7 @@ describe('PedidoParserService', () => {
       },
     });
 
-    const result = await service.parse(email);
+    const result = await service.parse(emailPedidoSimples);
 
     expect(llmParser.parse).toHaveBeenCalledOnce();
     expect(result.success).toBe(true);

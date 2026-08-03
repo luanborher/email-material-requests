@@ -6,7 +6,7 @@ import {
   getHeaderValue,
   mapGmailMessageToEmailMessage,
   parseSenderEmail,
-} from './gmail-message.parser.js';
+} from '../../src/utils/gmail-message.parser.js';
 
 describe('gmail-message.parser', () => {
   it('decodifica conteúdo base64url', () => {
