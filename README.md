@@ -55,10 +55,16 @@ tests/                   # Testes (Vitest) — ver tests/README.md
 └── utils/
 
 src/
+├── config/              # Variáveis de ambiente (importar de config/env.js)
 ├── database/            # Pool de conexão e mappers
 ├── repositories/        # Acesso a dados
 ├── routes/              # Rotas HTTP (Express)
-├── services/            # Lógica de negócio / orquestração
+├── services/            # Lógica de negócio por domínio
+│   ├── gmail/           # OAuth + leitura Gmail
+│   ├── pedido/          # Persistência de pedidos
+│   ├── parser/          # Regex + Ollama
+│   ├── worker/          # Polling e orquestração
+│   └── health/          # Health check
 ├── types/               # Tipos, enums e interfaces
 ├── utils/               # Funções utilitárias
 ├── app.ts               # Configuração do Express

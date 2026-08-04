@@ -4,9 +4,9 @@ vi.mock('../../src/config/ai.config.js', () => ({
   isAiConfigured: () => true,
 }));
 
-import { PedidoParserService } from '../../src/services/pedido-parser.service.js';
-import { RegexPedidoParser } from '../../src/services/parsers/regex-pedido.parser.js';
-import type { LlmPedidoParser } from '../../src/services/parsers/llm-pedido.parser.js';
+import { PedidoParserService } from '../../src/services/parser/pedido-parser.service.js';
+import { RegexPedidoParser } from '../../src/services/parser/regex-pedido.parser.js';
+import type { LlmPedidoParser } from '../../src/services/parser/llm-pedido.parser.js';
 import { ParserType } from '../../src/types/enums.js';
 import { emailPedidoSimples } from '../fixtures/email.js';
 

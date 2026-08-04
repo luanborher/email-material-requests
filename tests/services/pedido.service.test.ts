@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PedidoService } from '../../src/services/pedido.service.js';
+import { PedidoService } from '../../src/services/pedido/pedido.service.js';
 import { PedidoStatus } from '../../src/types/enums.js';
 import {
   criarItensMock,

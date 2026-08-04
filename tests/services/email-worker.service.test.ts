@@ -1,13 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { EmailMessage } from '../../src/types/email.js';
-import { EmailWorkerService } from '../../src/services/email-worker.service.js';
-import type { GmailService } from '../../src/services/gmail.service.js';
+import { EmailWorkerService } from '../../src/services/worker/email-worker.service.js';
+import type { GmailService } from '../../src/services/gmail/gmail.service.js';
 
-vi.mock('../../src/services/email-processing.service.js', () => ({
+vi.mock('../../src/services/worker/email-processing.service.js', () => ({
   parseAndSavePedido: vi.fn(),
 }));
 
-import { parseAndSavePedido } from '../../src/services/email-processing.service.js';
+import { parseAndSavePedido } from '../../src/services/worker/email-processing.service.js';
 
 const email: EmailMessage = {
   gmailMessageId: 'msg-001',

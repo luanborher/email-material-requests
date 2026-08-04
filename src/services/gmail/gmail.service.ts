@@ -1,7 +1,7 @@
 import { google, type gmail_v1 } from 'googleapis';
 import type { GmailAuthService } from './gmail-auth.service.js';
-import type { EmailMessage } from '../types/email.js';
-import { mapGmailMessageToEmailMessage } from '../utils/gmail-message.parser.js';
+import type { EmailMessage } from '../../types/email.js';
+import { mapGmailMessageToEmailMessage } from '../../utils/gmail-message.parser.js';
 import { gmailAuthService } from './gmail-auth.service.js';
 
 export class GmailService {

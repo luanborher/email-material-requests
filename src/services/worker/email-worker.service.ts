@@ -1,6 +1,6 @@
-import type { GmailService } from "./gmail.service.js";
+import type { GmailService } from "../gmail/gmail.service.js";
 import { parseAndSavePedido } from "./email-processing.service.js";
-import { getErrorMessage } from "../utils/error.js";
+import { getErrorMessage } from "../../utils/error.js";
 
 interface WorkerCycleError {
   messageId: string;
@@ -56,9 +56,6 @@ export class EmailWorkerService {
     }
   }
 
-  /**
-   * Lista não lidos, processa cada um e retorna métricas
-   */
   async runCycle(): Promise<WorkerCycleResult> {
     const result: WorkerCycleResult = {
       processed: 0,
@@ -92,13 +89,7 @@ export class EmailWorkerService {
     return result;
   }
 
-  /**
-   * Processo: Busca e-mail, parse, save e marca lido
-   */
-  private async processMessage(
-    messageId: string,
-    result: WorkerCycleResult,
-  ): Promise<void> {
+  private async processMessage(messageId: string, result: WorkerCycleResult): Promise<void> {
     const email = await this.gmailService.getMessage(messageId);
     const { parsed, saved } = await parseAndSavePedido(email);
 

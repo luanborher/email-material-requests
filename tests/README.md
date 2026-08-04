@@ -7,8 +7,8 @@ Todos os testes ficam em `tests/`, na raiz do projeto, separados do código em `
 ```
 tests/
 ├── fixtures/          # Dados reutilizáveis (e-mails, pedidos mock)
-├── services/          # Testes de services (espelha src/services/)
-│   └── parsers/       # Testes dos parsers regex/LLM
+├── services/          # Testes de services (espelha src/services/ por domínio)
+│   └── parsers/       # Testes do parser (regex / LLM)
 └── utils/             # Testes de utilitários
 ```
 
@@ -22,5 +22,5 @@ npm run test:watch # modo watch
 ## Convenções
 
 - Arquivos: `*.test.ts`
-- Imports do código fonte: `../../src/services/...` (relativo ao arquivo de teste)
+- Imports do código fonte: `../../src/services/<domínio>/...`
 - Mocks de módulos: caminho igual ao usado pelo arquivo testado em `src/`

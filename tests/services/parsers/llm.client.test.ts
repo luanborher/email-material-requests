@@ -11,7 +11,7 @@ vi.mock('../../../src/config/env.js', () => ({
   },
 }));
 
-import { callOllama } from '../../../src/services/parsers/llm.client.js';
+import { callOllama } from '../../../src/services/parser/llm.client.js';
 
 describe('callOllama', () => {
   afterEach(() => {

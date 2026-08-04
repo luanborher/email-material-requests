@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { parseAndSavePedido } from '../services/email-processing.service.js';
+import { parseAndSavePedido } from '../services/worker/email-processing.service.js';
 import type { EmailMessage } from '../types/email.js';
 import { getErrorMessage } from '../utils/error.js';
 

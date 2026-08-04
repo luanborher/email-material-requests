@@ -1,16 +1,16 @@
 import {
   toCreatePedidoInput,
   toCreatePedidoItemInputs,
-} from '../database/mappers/pedido-input.mapper.js';
-import type { PedidoItemRepository } from '../repositories/pedido-item.repository.js';
-import type { PedidoRepository } from '../repositories/pedido.repository.js';
+} from '../../database/mappers/pedido-input.mapper.js';
+import type { PedidoItemRepository } from '../../repositories/pedido-item.repository.js';
+import type { PedidoRepository } from '../../repositories/pedido.repository.js';
 import type {
   EmailMessage,
   ParsedPedidoData,
   ProcessarPedidoResult,
-} from '../types/email.js';
-import { PedidoStatus } from '../types/enums.js';
-import { isUniqueConstraintError } from '../utils/db-error.js';
+} from '../../types/email.js';
+import { PedidoStatus } from '../../types/enums.js';
+import { isUniqueConstraintError } from '../../utils/db-error.js';
 
 export class PedidoService {
   constructor(

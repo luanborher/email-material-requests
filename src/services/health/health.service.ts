@@ -1,6 +1,6 @@
-import { checkDatabaseConnection } from '../database/connection.js';
-import type { HealthCheckResponse } from '../types/health.js';
-import { getUptimeSeconds } from '../utils/uptime.js';
+import { checkDatabaseConnection } from "../../database/connection.js";
+import type { HealthCheckResponse } from "../../types/health.js";
+import { getUptimeSeconds } from "../../utils/uptime.js";
 
 export async function getHealthStatus(): Promise<HealthCheckResponse> {
   let databaseConnected = false;
@@ -12,11 +12,11 @@ export async function getHealthStatus(): Promise<HealthCheckResponse> {
   }
 
   return {
-    status: databaseConnected ? 'ok' : 'degraded',
+    status: databaseConnected ? "ok" : "degraded",
     timestamp: new Date().toISOString(),
     uptime: getUptimeSeconds(),
     database: {
-      status: databaseConnected ? 'connected' : 'disconnected',
+      status: databaseConnected ? "connected" : "disconnected",
     },
   };
 }

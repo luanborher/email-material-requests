@@ -2,7 +2,7 @@ import { createApp } from './app.js';
 import { env } from './config/env.js';
 import { isGmailFullyConfigured } from './config/gmail.config.js';
 import { closePool } from './database/connection.js';
-import { emailWorkerService } from './services/email-worker.instance.js';
+import { emailWorkerService } from './services/worker/email-worker.instance.js';
 
 const SHUTDOWN_TIMEOUT_MS = 10_000;
 

@@ -4,8 +4,8 @@ import {
   MAX_GMAIL_MESSAGES_PER_REQUEST,
 } from '../config/gmail.constants.js';
 import { GmailConfigError } from '../config/gmail.config.js';
-import { parseAndSavePedido } from '../services/email-processing.service.js';
-import { gmailService } from '../services/gmail.service.js';
+import { parseAndSavePedido } from '../services/worker/email-processing.service.js';
+import { gmailService } from '../services/gmail/gmail.service.js';
 import { getErrorMessage } from '../utils/error.js';
 
 export const gmailRouter = Router();

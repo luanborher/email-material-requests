@@ -64,7 +64,7 @@ Se Ollama não está rodando e o regex falhou, o parse retorna erro.
 
 ---
 
-### `src/services/email-worker.service.ts`
+### `src/services/worker/email-worker.service.ts`
 
 | Função | O que faz |
 |--------|-----------|
@@ -75,7 +75,7 @@ Se Ollama não está rodando e o regex falhou, o parse retorna erro.
 
 ---
 
-### `src/services/email-processing.service.ts`
+### `src/services/worker/email-processing.service.ts`
 
 | Função | O que faz |
 |--------|-----------|
@@ -83,7 +83,7 @@ Se Ollama não está rodando e o regex falhou, o parse retorna erro.
 
 ---
 
-### `src/services/pedido-parser.service.ts`
+### `src/services/parser/pedido-parser.service.ts`
 
 | Função | O que faz |
 |--------|-----------|
@@ -91,7 +91,7 @@ Se Ollama não está rodando e o regex falhou, o parse retorna erro.
 
 ---
 
-### `src/services/parsers/regex-pedido.parser.ts`
+### `src/services/parser/regex-pedido.parser.ts`
 
 | Função | O que faz |
 |--------|-----------|
@@ -102,7 +102,7 @@ Se Ollama não está rodando e o regex falhou, o parse retorna erro.
 
 ---
 
-### `src/services/parsers/llm-pedido.parser.ts`
+### `src/services/parser/llm-pedido.parser.ts`
 
 | Função | O que faz |
 |--------|-----------|
@@ -112,7 +112,7 @@ Se Ollama não está rodando e o regex falhou, o parse retorna erro.
 
 ---
 
-### `src/services/parsers/llm.client.ts`
+### `src/services/parser/llm.client.ts`
 
 | Função | O que faz |
 |--------|-----------|
@@ -120,7 +120,7 @@ Se Ollama não está rodando e o regex falhou, o parse retorna erro.
 
 ---
 
-### `src/services/pedido.service.ts`
+### `src/services/pedido/pedido.service.ts`
 
 | Função | O que faz |
 |--------|-----------|
@@ -128,7 +128,7 @@ Se Ollama não está rodando e o regex falhou, o parse retorna erro.
 
 ---
 
-### `src/services/gmail.service.ts`
+### `src/services/gmail/gmail.service.ts`
 
 | Função | O que faz |
 |--------|-----------|

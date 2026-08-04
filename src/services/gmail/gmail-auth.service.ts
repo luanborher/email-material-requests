@@ -1,11 +1,11 @@
 import { google } from 'googleapis';
 import type { Credentials } from 'google-auth-library';
-import { env } from '../config/env.js';
+import { env } from '../../config/env.js';
 import {
   assertGmailFullyConfigured,
   assertGmailOAuthConfigured,
-} from '../config/gmail.config.js';
-import { GMAIL_SCOPES } from '../config/gmail.constants.js';
+} from '../../config/gmail.config.js';
+import { GMAIL_SCOPES } from '../../config/gmail.constants.js';
 
 export interface GmailTokenResponse {
   accessToken: string;

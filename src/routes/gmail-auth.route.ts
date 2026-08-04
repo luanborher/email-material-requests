@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { gmailAuthService } from '../services/gmail-auth.service.js';
+import { gmailAuthService } from '../services/gmail/gmail-auth.service.js';
 import { GmailConfigError } from '../config/gmail.config.js';
 import { escapeHtml, getErrorMessage } from '../utils/error.js';
 
